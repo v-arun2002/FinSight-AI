@@ -31,6 +31,16 @@ class ResearchResponse(BaseModel):
 
 # ---- Endpoints ----
 
+@app.get("/")
+def root():
+    return {
+        "service": "FinSight-AI",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
+
 @app.get("/health")
 def health_check():
     """
