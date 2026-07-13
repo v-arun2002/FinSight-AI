@@ -9,7 +9,7 @@ load_dotenv()
 app = FastAPI(
     title="FinSight-AI",
     description="Multi-agent financial research system powered by LangGraph",
-    version="1.0.0"
+    version="1.0.1"
 )
 
 # Build graph once at startup — not on every request
