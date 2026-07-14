@@ -25,6 +25,10 @@ class ResearchResponse(BaseModel):
     risk_level: str
     report: str
     errors: list
+    stock_data: dict = {}
+    macro_data: dict = {}
+    news_data: dict = {}
+    analysis: dict = {}
 
 @app.get("/")
 def root():
@@ -57,7 +61,11 @@ async def run_research(request: ResearchRequest):
             confidence=float(analysis.get("confidence", 0.0)),
             risk_level=analysis.get("risk_level", "unavailable"),
             report=result.get("report", ""),
-            errors=result.get("errors", [])
+            errors=result.get("errors", []),
+            stock_data=result.get("stock_data", {}),
+            macro_data=result.get("macro_data", {}),
+            news_data=result.get("news_data", {}),
+            analysis=analysis
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Pipeline failed: {str(e)}")
