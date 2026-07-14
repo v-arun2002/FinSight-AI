@@ -1,21 +1,18 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from graph.orchestrator import build_graph
 
 load_dotenv()
 
-# Initialize FastAPI app
 app = FastAPI(
     title="FinSight-AI",
     description="Multi-agent financial research system powered by LangGraph",
     version="1.0.1"
 )
 
-# Build graph once at startup — not on every request
 graph = build_graph()
-
-# ---- Request/Response Models ----
 
 class ResearchRequest(BaseModel):
     query: str
@@ -29,32 +26,16 @@ class ResearchResponse(BaseModel):
     report: str
     errors: list
 
-# ---- Endpoints ----
-
 @app.get("/")
 def root():
-    return {
-        "service": "FinSight-AI",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/health"
-    }
-
+    return FileResponse("frontend.html")
 
 @app.get("/health")
 def health_check():
-    """
-    Health check endpoint.
-    Render and Docker ping this to verify app is running.
-    """
     return {"status": "ok", "service": "FinSight-AI"}
 
 @app.post("/research", response_model=ResearchResponse)
 async def run_research(request: ResearchRequest):
-    """
-    Main endpoint — runs full multi-agent pipeline.
-    Accepts ticker and query, returns investment brief.
-    """
     initial_state = {
         "query": request.query,
         "ticker": request.ticker,
@@ -67,13 +48,9 @@ async def run_research(request: ResearchRequest):
         "report": "",
         "errors": []
     }
-    
     try:
         result = graph.invoke(initial_state)
-        
-        # Extract analysis fields safely
         analysis = result.get("analysis") or {}
-        
         return ResearchResponse(
             ticker=result.get("ticker", request.ticker),
             recommendation=analysis.get("recommendation", "unavailable"),
@@ -82,9 +59,5 @@ async def run_research(request: ResearchRequest):
             report=result.get("report", ""),
             errors=result.get("errors", [])
         )
-    
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Pipeline failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Pipeline failed: {str(e)}")

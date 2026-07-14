@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinSight-AI</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
+.header{padding:16px 32px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon i{color:#fff;font-size:16px}
+.logo-name{font-size:15px;font-weight:500;color:#fff}
+.logo-badge{font-size:11px;color:#60a5fa;background:#1e3a5f;border:1px solid #2563eb44;border-radius:4px;padding:2px 7px}
+.nav-links{display:flex;gap:8px}
+.nav-link{font-size:13px;color:#888;text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid transparent;transition:all 0.15s}
+.nav-link:hover{background:#1a1a1a;border-color:#2a2a2a;color:#ccc}
+.main{max-width:760px;margin:0 auto;padding:40px 24px}
+.hero{text-align:center;margin-bottom:40px}
+.hero h1{font-size:28px;font-weight:500;color:#fff;margin-bottom:10px;line-height:1.3}
+.hero p{font-size:15px;color:#888;line-height:1.7;max-width:500px;margin:0 auto 20px}
+.agent-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.pill{font-size:11px;color:#888;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:4px 10px;display:flex;align-items:center;gap:5px}
+.pill i{font-size:12px;color:#60a5fa}
+.input-card{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:28px;margin-bottom:20px}
+.input-row{display:grid;grid-template-columns:180px 1fr;gap:16px;margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:500;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px}
+.field input{width:100%;height:40px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:0 12px;font-size:14px;color:#fff;outline:none;transition:border-color 0.15s}
+.field input:focus{border-color:#2563eb;box-shadow:0 0 0 3px #2563eb22}
+.field input::placeholder{color:#444}
+.analyze-btn{width:100%;height:42px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s}
+.analyze-btn:hover{background:#1d4ed8}
+.analyze-btn:disabled{background:#1a1a1a;color:#444;cursor:not-allowed}
+.analyze-btn i{font-size:15px}
+.loading-state{display:none;background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:32px;text-align:center;margin-bottom:20px}
+.loading-state.show{display:block}
+.progress-steps{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:20px auto 0;text-align:left}
+.step{display:flex;align-items:center;gap:10px;font-size:13px;color:#555;transition:color 0.3s}
+.step.active{color:#e0e0e0}
+.step.done{color:#4ade80}
+.step-icon{width:20px;height:20px;border-radius:50%;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.3s}
+.step.active .step-icon{border-color:#2563eb;background:#1e3a5f}
+.step.active .step-icon i{color:#60a5fa}
+.step.done .step-icon{border-color:#166534;background:#14532d}
+.step.done .step-icon i{color:#4ade80}
+.step-icon i{font-size:11px;color:#555}
+.spinner{width:28px;height:28px;border:2px solid #1e1e1e;border-top-color:#2563eb;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-card{display:none;background:#111;border:1px solid #1e1e1e;border-radius:12px;overflow:hidden;margin-bottom:20px}
+.result-card.show{display:block}
+.result-header{padding:20px 24px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between}
+.ticker-name{font-size:18px;font-weight:500;color:#fff}
+.result-meta{font-size:12px;color:#555}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #1e1e1e}
+.metric{padding:20px 24px;border-right:1px solid #1e1e1e}
+.metric:last-child{border-right:none}
+.metric-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px}
+.metric-value{font-size:22px;font-weight:500}
+.buy{color:#4ade80}.hold{color:#facc15}.avoid{color:#f87171}
+.low{color:#4ade80}.medium{color:#facc15}.high{color:#f87171}
+.confidence-bar{margin-top:8px;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden}
+.confidence-fill{height:100%;background:#2563eb;border-radius:2px;transition:width 0.8s ease}
+.data-section{padding:20px 24px;border-bottom:1px solid #1e1e1e}
+.section-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:14px}
+.data-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.data-item{background:#0d0d0d;border-radius:6px;padding:12px}
+.data-item-label{font-size:11px;color:#555;margin-bottom:4px}
+.data-item-value{font-size:14px;font-weight:500;color:#e0e0e0}
+.news-section{padding:20px 24px;border-bottom:1px solid #1e1e1e}
+.headline{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px;color:#888;line-height:1.5}
+.headline:last-child{border-bottom:none}
+.headline i{font-size:13px;color:#555;flex-shrink:0;margin-top:2px}
+.sentiment-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:4px;font-weight:500;margin-left:10px}
+.sentiment-positive{background:#14532d;color:#4ade80;border:1px solid #166534}
+.sentiment-negative{background:#450a0a;color:#f87171;border:1px solid #7f1d1d}
+.sentiment-neutral{background:#1a1a1a;color:#888;border:1px solid #2a2a2a}
+.analysis-section{padding:20px 24px;border-bottom:1px solid #1e1e1e}
+.analysis-text{font-size:14px;color:#aaa;line-height:1.8;background:#0d0d0d;border-radius:6px;padding:16px;border-left:3px solid #2563eb}
+.report-section{padding:20px 24px}
+.report-pre{font-size:12px;color:#888;font-family:'SF Mono','Fira Code',monospace;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:6px;padding:16px;white-space:pre-wrap;line-height:1.7}
+.error-banner{background:#450a0a;border:1px solid #7f1d1d;border-radius:6px;padding:12px 16px;font-size:13px;color:#f87171;display:none;margin-bottom:16px}
+.error-banner.show{display:flex;align-items:center;gap:8px}
+.examples{margin-top:16px}
+.examples-label{font-size:12px;color:#555;margin-bottom:8px}
+.example-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:12px;color:#60a5fa;background:#1e3a5f;border:1px solid #2563eb44;border-radius:20px;padding:4px 12px;cursor:pointer;transition:all 0.15s}
+.chip:hover{background:#2563eb;color:#fff}
+.footer{text-align:center;padding:24px;font-size:12px;color:#444;border-top:1px solid #1e1e1e;margin-top:8px}
+.footer a{color:#60a5fa;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-chart-candle"></i></div>
+    <span class="logo-name">FinSight-AI</span>
+    <span class="logo-badge">Multi-agent</span>
+  </div>
+  <nav class="nav-links">
+    <a href="https://finsight-ai-imjw.onrender.com/docs" class="nav-link"><i class="ti ti-code"></i> API docs</a>
+    <a href="https://github.com/v-arun2002/FinSight-AI" class="nav-link"><i class="ti ti-brand-github"></i> GitHub</a>
+  </nav>
+</div>
+
+<div class="main">
+  <div class="hero">
+    <h1>AI-powered investment research</h1>
+    <p>5 specialized agents analyze stock fundamentals, macroeconomic indicators, and live news to generate investment briefs in seconds.</p>
+    <div class="agent-pills">
+      <span class="pill"><i class="ti ti-database"></i>Data agent</span>
+      <span class="pill"><i class="ti ti-world"></i>Macro agent</span>
+      <span class="pill"><i class="ti ti-news"></i>News agent</span>
+      <span class="pill"><i class="ti ti-brain"></i>Analysis agent</span>
+      <span class="pill"><i class="ti ti-file-text"></i>Report agent</span>
+    </div>
+  </div>
+
+  <div class="input-card">
+    <div class="input-row">
+      <div class="field">
+        <label for="ticker">Ticker symbol</label>
+        <input type="text" id="ticker" placeholder="NVDA" maxlength="5">
+      </div>
+      <div class="field">
+        <label for="query">Research question</label>
+        <input type="text" id="query" placeholder="Is this a good long-term investment?">
+      </div>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+      <i class="ti ti-sparkles"></i> Analyze stock
+    </button>
+    <div class="examples">
+      <div class="examples-label">Try an example</div>
+      <div class="example-chips">
+        <span class="chip" onclick="setExample('NVDA','Is NVIDIA a good buy given AI tailwinds?')">NVDA</span>
+        <span class="chip" onclick="setExample('AAPL','Should I hold Apple stock long term?')">AAPL</span>
+        <span class="chip" onclick="setExample('TSLA','Is Tesla undervalued right now?')">TSLA</span>
+        <span class="chip" onclick="setExample('MSFT','Is Microsoft a safe investment in 2025?')">MSFT</span>
+        <span class="chip" onclick="setExample('META','How is Meta positioned for AI growth?')">META</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-banner" id="errorBanner">
+    <i class="ti ti-alert-circle"></i>
+    <span id="errorMsg"></span>
+  </div>
+
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <p style="font-size:14px;color:#888;margin-bottom:4px">Running agents</p>
+    <p style="font-size:12px;color:#555">Fetching live data, analyzing markets…</p>
+    <div class="progress-steps" id="progressSteps">
+      <div class="step" id="s1"><div class="step-icon"><i class="ti ti-circle"></i></div>Fetching stock data</div>
+      <div class="step" id="s2"><div class="step-icon"><i class="ti ti-circle"></i></div>Pulling macro indicators</div>
+      <div class="step" id="s3"><div class="step-icon"><i class="ti ti-circle"></i></div>Searching live news</div>
+      <div class="step" id="s4"><div class="step-icon"><i class="ti ti-circle"></i></div>Running LLM analysis</div>
+      <div class="step" id="s5"><div class="step-icon"><i class="ti ti-circle"></i></div>Generating report</div>
+    </div>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <div>
+        <span class="ticker-name" id="resultTicker"></span>
+        <span id="sentimentBadge"></span>
+      </div>
+      <span class="result-meta" id="resultTime"></span>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-label">Recommendation</div>
+        <div class="metric-value" id="recValue">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Confidence</div>
+        <div class="metric-value" id="confValue">—</div>
+        <div class="confidence-bar"><div class="confidence-fill" id="confBar" style="width:0%"></div></div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Risk level</div>
+        <div class="metric-value" id="riskValue">—</div>
+      </div>
+    </div>
+    <div class="data-section">
+      <div class="section-label">Stock data</div>
+      <div class="data-grid" id="stockGrid"></div>
+    </div>
+    <div class="data-section">
+      <div class="section-label">Macro context</div>
+      <div class="data-grid" id="macroGrid"></div>
+    </div>
+    <div class="news-section">
+      <div class="section-label" style="display:flex;align-items:center;gap:8px">
+        Live news <span id="newsSentiment"></span>
+      </div>
+      <div id="headlinesList"></div>
+    </div>
+    <div class="analysis-section">
+      <div class="section-label">Analysis</div>
+      <div class="analysis-text" id="analysisText"></div>
+    </div>
+    <div class="report-section">
+      <div class="section-label" style="margin-bottom:12px">Full investment brief</div>
+      <pre class="report-pre" id="reportPre"></pre>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Built with LangGraph · Pydantic AI · FastAPI · Docker · Render &nbsp;·&nbsp;
+  <a href="https://github.com/v-arun2002/FinSight-AI">View source</a>
+</div>
+
+<script>
+const API = "https://finsight-ai-imjw.onrender.com";
+
+function setExample(t,q){
+  document.getElementById("ticker").value=t;
+  document.getElementById("query").value=q;
+}
+
+function stepProgress(active){
+  for(let i=1;i<=5;i++){
+    const el=document.getElementById("s"+i);
+    el.className="step"+(i<active?" done":i===active?" active":"");
+    const icon=el.querySelector("i");
+    icon.className=i<active?"ti ti-check":i===active?"ti ti-loader":"ti ti-circle";
+  }
+}
+
+async function analyze(){
+  const ticker=document.getElementById("ticker").value.trim().toUpperCase();
+  const query=document.getElementById("query").value.trim();
+  if(!ticker||!query){showError("Enter a ticker symbol and a research question.");return;}
+  hideError();
+  document.getElementById("resultCard").classList.remove("show");
+  document.getElementById("loadingState").classList.add("show");
+  document.getElementById("analyzeBtn").disabled=true;
+  let step=1;stepProgress(1);
+  const delays=[3000,5000,4000,6000,3000];
+  const iv=setInterval(()=>{step=Math.min(step+1,5);stepProgress(step);},delays[step-1]||4000);
+  try{
+    const res=await fetch(`${API}/research`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ticker,query})
+    });
+    clearInterval(iv);stepProgress(6);
+    if(!res.ok)throw new Error(`Server error ${res.status}`);
+    const d=await res.json();
+    renderResult(d,ticker);
+  }catch(e){
+    clearInterval(iv);
+    showError("Request failed. The service may be starting up — try again in 30 seconds.");
+  }finally{
+    document.getElementById("loadingState").classList.remove("show");
+    document.getElementById("analyzeBtn").disabled=false;
+  }
+}
+
+function renderResult(d,ticker){
+  document.getElementById("resultTicker").textContent=ticker;
+  document.getElementById("resultTime").textContent=new Date().toLocaleTimeString();
+  const rec=(d.recommendation||"unavailable").toLowerCase();
+  const recEl=document.getElementById("recValue");
+  recEl.textContent=rec.toUpperCase();recEl.className="metric-value "+rec;
+  const conf=Math.round((d.confidence||0)*100);
+  document.getElementById("confValue").textContent=conf+"%";
+  document.getElementById("confBar").style.width=conf+"%";
+  const risk=(d.risk_level||"unknown").toLowerCase();
+  const riskEl=document.getElementById("riskValue");
+  riskEl.textContent=risk.charAt(0).toUpperCase()+risk.slice(1);
+  riskEl.className="metric-value "+risk;
+  const stock=d.stock_data||{};
+  document.getElementById("stockGrid").innerHTML=[
+    ["Current price",stock.price?"$"+Number(stock.price).toLocaleString(undefined,{maximumFractionDigits:2}):"N/A"],
+    ["P/E ratio",stock.pe_ratio?Number(stock.pe_ratio).toFixed(2):"N/A"],
+    ["Market cap",stock.market_cap?"$"+Number(stock.market_cap/1e12).toFixed(2)+"T":"N/A"],
+    ["Volume",stock.volume?Number(stock.volume).toLocaleString():"N/A"]
+  ].map(([l,v])=>`<div class="data-item"><div class="data-item-label">${l}</div><div class="data-item-value">${v}</div></div>`).join("");
+  const macro=d.macro_data||{};
+  document.getElementById("macroGrid").innerHTML=[
+    ["Interest rate",macro.interest_rate!=null?Number(macro.interest_rate).toFixed(2)+"%":"N/A"],
+    ["Inflation (CPI)",macro.inflation_rate!=null?Number(macro.inflation_rate).toFixed(1):"N/A"],
+    ["GDP growth",macro.gdp_growth!=null?Number(macro.gdp_growth).toFixed(1)+"%":"N/A"],
+    ["Unemployment",macro.unemployment_rate!=null?Number(macro.unemployment_rate).toFixed(1)+"%":"N/A"]
+  ].map(([l,v])=>`<div class="data-item"><div class="data-item-label">${l}</div><div class="data-item-value">${v}</div></div>`).join("");
+  const news=d.news_data||{};
+  const sent=(news.sentiment||"neutral").toLowerCase();
+  const sentClass=sent==="positive"?"sentiment-positive":sent==="negative"?"sentiment-negative":"sentiment-neutral";
+  const sentIcon=sent==="positive"?"ti-trending-up":sent==="negative"?"ti-trending-down":"ti-minus";
+  document.getElementById("newsSentiment").innerHTML=`<span class="sentiment-badge ${sentClass}"><i class="ti ${sentIcon}"></i>${sent}</span>`;
+  const headlines=news.headlines||[];
+  document.getElementById("headlinesList").innerHTML=headlines.slice(0,4).map(h=>`<div class="headline"><i class="ti ti-news"></i>${h}</div>`).join("")||'<div class="headline"><i class="ti ti-news"></i>No headlines found</div>';
+  document.getElementById("analysisText").textContent=(d.analysis||{}).summary||"Analysis unavailable";
+  document.getElementById("reportPre").textContent=d.report||"";
+  document.getElementById("resultCard").classList.add("show");
+  document.getElementById("resultCard").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function showError(msg){
+  document.getElementById("errorMsg").textContent=msg;
+  document.getElementById("errorBanner").classList.add("show");
+}
+function hideError(){document.getElementById("errorBanner").classList.remove("show");}
+
+document.addEventListener("keydown",e=>{if(e.key==="Enter")analyze();});
+</script>
+</body>
+</html>
